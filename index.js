@@ -12,11 +12,19 @@ http.createServer((req, res) => {
     console.log("[System] Serverul de mentinere uptime a pornit.");
 });
 
-// 2. CONFIGURARE SELFBOT
-const client = new Client({ checkUpdate: false });
-const StreamClient = new DiscordStreamClient(client);
+// 2. CONFIGURARE SELFBOT CU TOATE PERMISIUNILE DE CITIRE
+const client = new Client({
+    checkUpdate: false,
+    patchVoice: true, // Esential pentru ecrane video/screenshare active
+    intents: [
+        "GUILDS",
+        "GUILD_MESSAGES",
+        "DIRECT_MESSAGES",
+        "GUILD_VOICE_STATES"
+    ]
+});
 
-// Setam rezolutia pentru Screenshare (Go Live)
+const StreamClient = new DiscordStreamClient(client);
 StreamClient.setResolution('720p'); 
 
 const PREFIX = "!";
@@ -49,10 +57,15 @@ async function getRawStreamUrl(url) {
 }
 
 client.on("ready", () => {
-    console.log(`Selfbot Node.js este ONLINE pe contul: ${client.user.tag}`);
+    // Mesaj critic in Log-uri ca sa stim sigur daca s-a autentificat contul corect
+    console.log(`=========================================`);
+    console.log(`STATUS: CONECTAT CU SUCCES!`);
+    console.log(`Cont utilizator activat: ${client.user.tag}`);
+    console.log(`=========================================`);
 });
 
 client.on("messageCreate", async (message) => {
+    // IMPORTANT: Robotul reactioneaza DOAR cand TU trimiti mesajul!
     if (message.author.id !== client.user.id) return;
     if (!message.content.startsWith(PREFIX)) return;
 
@@ -126,7 +139,6 @@ client.on("messageCreate", async (message) => {
                 try { activeVoice.disconnect(); } catch(e){}
             }
 
-            // Preluam datele proaspete ale canalului
             const targetChannel = await client.channels.fetch(voiceChannel.id);
 
             activeVoice = await StreamClient.joinVoiceChannel(
