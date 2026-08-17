@@ -1,0 +1,14 @@
+{
+  "name": "discord-screenshare-bot",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "discord.js-selfbot-v13": "^13.14.1",
+    "discord-stream-client": "^1.1.2",
+    "yt-dlp-exec": "^5.0.3"
+  }
+}
