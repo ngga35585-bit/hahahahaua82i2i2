@@ -3,7 +3,7 @@ import { Client } from "discord.js-selfbot-v13";
 import { DiscordStreamClient } from "discord-stream-client";
 import ytDlp from "yt-dlp-exec";
 
-// 1. SERVER WEB PENTRU UPTIME
+// 1. SERVER WEB PENTRU UPTIME (Mentine serviciul activ pe Render)
 http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.write("Selfbot is alive 24/7!");
@@ -16,6 +16,7 @@ http.createServer((req, res) => {
 const client = new Client({ checkUpdate: false, patchVoice: true });
 const StreamClient = new DiscordStreamClient(client);
 
+// Setam rezolutia implicita pentru Screenshare
 StreamClient.setResolution('720p'); 
 
 const PREFIX = "!";
@@ -31,6 +32,7 @@ const YELLOW = "\u001b[33m";
 const BLUE = "\u001b[34m";
 const CYAN = "\u001b[36m";
 
+// Functie pentru extragerea URL-ului brut de streaming
 async function getRawStreamUrl(url) {
     try {
         console.log(`[Extractor] Se proceseaza link-ul: ${url}`);
@@ -42,11 +44,12 @@ async function getRawStreamUrl(url) {
         });
         return output.url;
     } catch (error) {
-        console.error("[Extractor] Eroare:", error);
+        console.error("[Extractor] Eroare la decodare link:", error);
         return null;
     }
 }
 
+// Evenimentul Ready - Se declanseaza DOAR daca token-ul este 100% corect
 client.on("ready", () => {
     console.log("=========================================");
     console.log("STATUS: CONECTAT LA DISCORD CU SUCCES!");
@@ -54,9 +57,9 @@ client.on("ready", () => {
     console.log("=========================================");
 });
 
-// Ascultam mesajele primite prin evenimentul compatibil de utilizator
+// Ascultam mesajele primite pentru comenzi
 client.on("message", async (message) => {
-    // Reactioneaza doar daca TU trimiti comanda
+    // Robotul raspunde doar daca TU (proprietarul contului) ai scris comanda
     if (message.author.id !== client.user.id) return;
     if (!message.content.startsWith(PREFIX)) return;
 
@@ -107,7 +110,7 @@ client.on("message", async (message) => {
 
     // COMANDA: !play <link>
     if (command === "play") {
-        const videoUrl = args[0]; // Extrage corect link-ul stocat in primul argument
+        const videoUrl = args[0]; // Preluam primul argument (link-ul brut)
         if (!videoUrl) {
             return message.reply(`\`\`\`ansi\n${RED}[WARN]${RESET} Sintaxa incorecta. Adauga link: !play <link>\n\`\`\``);
         }
@@ -130,6 +133,7 @@ client.on("message", async (message) => {
                 try { activeVoice.disconnect(); } catch(e){}
             }
 
+            // Preluam datele proaspete ale canalului de voce direct din API
             const targetChannel = await client.channels.fetch(voiceChannel.id);
 
             activeVoice = await StreamClient.joinVoiceChannel(
@@ -153,7 +157,7 @@ client.on("message", async (message) => {
             player.play();
 
         } catch (error) {
-            console.error(error);
+            console.error("[Stream Error]", error);
             await statusMsg.edit(`\`\`\`ansi\n${RED}[ERROR]${RESET} Eroare la deschiderea fluxului video: ${error.message}\n\`\`\``);
         }
     }
@@ -172,4 +176,13 @@ client.on("message", async (message) => {
     }
 });
 
-client.login(process.env.DISCORD_TOKEN);
+// 3. PORNIRE SI DIAGNOSTICARE TOKEN
+console.log("[System] Se porneste autentificarea la Discord Gateway...");
+
+client.login(process.env.DISCORD_TOKEN).catch((error) => {
+    console.error("=========================================");
+    console.error("❌ EROARE CRITICĂ: AUTENTIFICAREA A EȘUAT!");
+    console.error(`Motiv: ${error.message}`);
+    console.error("Verifică dacă DISCORD_TOKEN are ghilimele sau spații în Render.");
+    console.error("=========================================");
+});
