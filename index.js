@@ -12,7 +12,7 @@ http.createServer((req, res) => {
     console.log("[System] Serverul de mentinere uptime a pornit.");
 });
 
-// 2. CONFIGURARE SELFBOT (FARA INTENTS - LIBRARIA TRAGE AUTOMAT DATELE DE USER)
+// 2. CONFIGURARE SELFBOT
 const client = new Client({ checkUpdate: false, patchVoice: true });
 const StreamClient = new DiscordStreamClient(client);
 
@@ -33,7 +33,7 @@ const CYAN = "\u001b[36m";
 
 async function getRawStreamUrl(url) {
     try {
-        console.log(`[Extractor] Se proceseaza link-ul: \${url}`);
+        console.log(`[Extractor] Se proceseaza link-ul: ${url}`);
         const output = await ytDlp(url, {
             dumpSingleJson: true,
             noWarnings: true,
@@ -50,13 +50,13 @@ async function getRawStreamUrl(url) {
 client.on("ready", () => {
     console.log("=========================================");
     console.log("STATUS: CONECTAT LA DISCORD CU SUCCES!");
-    console.log(`Cont activat: \${client.user.tag}`);
+    console.log(`Cont activat: ${client.user.tag}`);
     console.log("=========================================");
 });
 
-// FOLOSIM EVENIMENTUL CLASIC PENTRU COPIEREA MESAJELOR DE USER
+// Ascultam mesajele primite prin evenimentul compatibil de utilizator
 client.on("message", async (message) => {
-    // Asculta doar comenzile trimise direct de TINE
+    // Reactioneaza doar daca TU trimiti comanda
     if (message.author.id !== client.user.id) return;
     if (!message.content.startsWith(PREFIX)) return;
 
@@ -70,13 +70,13 @@ client.on("message", async (message) => {
         if (!cmdArg) {
             return message.reply(
                 "```ansi\n" +
-                `\${BLUE}BOLD=== MENIU CONTROL SELFBOT (NODE.JS) ==={RESET}\n` +
-                `Prefix curent: CYAN!{RESET}\n\n` +
-                `YELLOW!help{RESET}        - Afiseaza acest panou informativ\n` +
-                `YELLOW!help <cmd>{RESET}  - Detalii specifice despre o comanda\n` +
-                `YELLOW!play <link>{RESET} - Porneste screenshare video + audio (YouTube/Site-uri)\n` +
-                `YELLOW!stop{RESET}        - Opreste transmisiunea live si paraseste canalul\n\n` +
-                `BLUESistem adaptat complet fara emoji-uri si optimizat ANSI.{RESET}\n` +
+                `${BLUE}${BOLD}=== MENIU CONTROL SELFBOT (NODE.JS) ===${RESET}\n` +
+                `Prefix curent: ${CYAN}!${RESET}\n\n` +
+                `${YELLOW}!help${RESET}        - Afiseaza acest panou informativ\n` +
+                `${YELLOW}!help <cmd>${RESET}  - Detalii specifice despre o comanda\n` +
+                `${YELLOW}!play <link>${RESET} - Porneste screenshare video + audio (YouTube/Site-uri)\n` +
+                `${YELLOW}!stop${RESET}        - Opreste transmisiunea live si paraseste canalul\n\n` +
+                `${BLUE}Sistem adaptat complet fara emoji-uri si optimizat ANSI.${RESET}\n` +
                 "```"
             );
         }
@@ -84,9 +84,9 @@ client.on("message", async (message) => {
         if (cmdArg === "play") {
             return message.reply(
                 "```ansi\n" +
-                `\${BLUE}BOLDDETALII COMANDA: !play{RESET}\n\n` +
-                `GREENSintaxa:{RESET} !play <URL_Video>\n` +
-                `GREENDescriere:{RESET} Te urmareste automat pe orice canal vocal,\n` +
+                `${BLUE}${BOLD}DETALII COMANDA: !play${RESET}\n\n` +
+                `${GREEN}Sintaxa:${RESET} !play <URL_Video>\n` +
+                `${GREEN}Descriere:${RESET} Te urmareste automat pe orice canal vocal,\n` +
                 `           deschide o sesiune de Screenshare (Go Live) si\n` +
                 `           redirectioneaza imaginea si sunetul extras din link.\n` +
                 "```"
@@ -96,10 +96,10 @@ client.on("message", async (message) => {
         if (cmdArg === "stop") {
             return message.reply(
                 "```ansi\n" +
-                `\${BLUE}BOLDDETALII COMANDA: !stop{RESET}\n\n` +
-                `GREENSintaxa:{RESET} !stop\n` +
-                `GREENDescriere:{RESET} Opreste instant playerul video/audio si\n` +
-                `           inchide sesiunea de streaming de pe server.\n" +
+                `${BLUE}${BOLD}DETALII COMANDA: !stop${RESET}\n\n` +
+                `${GREEN}Sintaxa:${RESET} !stop\n` +
+                `${GREEN}Descriere:${RESET} Opreste instant playerul video/audio si\n` +
+                `           inchide sesiunea de streaming de pe server.\n` +
                 "```"
             );
         }
@@ -107,7 +107,7 @@ client.on("message", async (message) => {
 
     // COMANDA: !play <link>
     if (command === "play") {
-        const videoUrl = args[0]; // Extrage corect link-ul din primul argument primit
+        const videoUrl = args[0]; // Extrage corect link-ul stocat in primul argument
         if (!videoUrl) {
             return message.reply(`\`\`\`ansi\n${RED}[WARN]${RESET} Sintaxa incorecta. Adauga link: !play <link>\n\`\`\``);
         }
