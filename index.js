@@ -34,7 +34,7 @@ const CYAN = "\u001b[36m";
 
 async function getRawStreamUrl(url) {
     try {
-        console.log(`[Extractor] Se proceseaza link-ul: \${url}`);
+        console.log(`[Extractor] Se proceseaza link-ul: ${url}`);
         const output = await ytDlp(url, {
             dumpSingleJson: true,
             noWarnings: true,
@@ -49,7 +49,7 @@ async function getRawStreamUrl(url) {
 }
 
 client.on("ready", () => {
-    console.log(`Selfbot Node.js este ONLINE pe contul: \${client.user.tag}`);
+    console.log(`Selfbot Node.js este ONLINE pe contul: ${client.user.tag}`);
 });
 
 client.on("messageCreate", async (message) => {
@@ -66,11 +66,11 @@ client.on("messageCreate", async (message) => {
         if (!cmdArg) {
             return message.reply(
                 "```ansi\n" +
-                `\${BLUE}BOLD=== MENIU CONTROL SELFBOT (NODE.JS) ==={RESET}\n` +
-                `Prefix curent: CYAN!{RESET}\n\n` +
-                `YELLOW!help{RESET}        - Afiseaza acest panou informativ\n` +
-                `YELLOW!help <cmd>{RESET}  - Detalii specifice despre o comanda\n` +
-                `YELLOW!play <link>{RESET} - Porneste screenshare video + audio (YouTube/Site-uri)\n" +
+                `${BLUE}${BOLD}=== MENIU CONTROL SELFBOT (NODE.JS) ===${RESET}\n` +
+                `Prefix curent: ${CYAN}!${RESET}\n\n` +
+                `${YELLOW}!help${RESET}        - Afiseaza acest panou informativ\n` +
+                `${YELLOW}!help <cmd>${RESET}  - Detalii specifice despre o comanda\n` +
+                `${YELLOW}!play <link>${RESET} - Porneste screenshare video + audio (YouTube/Site-uri)\n` +
                 `${YELLOW}!stop${RESET}        - Opreste transmisiunea live si paraseste canalul\n\n` +
                 `${BLUE}Sistem adaptat complet fara emoji-uri si optimizat ANSI.${RESET}\n` +
                 "```"
@@ -126,8 +126,11 @@ client.on("messageCreate", async (message) => {
                 try { activeVoice.disconnect(); } catch(e){}
             }
 
+            // REPARAT: Fortam extragerea canalului direct prin API pentru a evita erorile de tip "couldn't find discord..."
+            const targetChannel = await client.channels.fetch(voiceChannel.id);
+
             activeVoice = await StreamClient.joinVoiceChannel(
-                client.channels.cache.get(voiceChannel.id),
+                targetChannel,
                 { selfDeaf: false, selfMute: false, selfVideo: false }
             );
 
