@@ -6,6 +6,9 @@
   "scripts": {
     "start": "node index.js"
   },
+  "nixpacks": {
+    "dependsOn": ["ffmpeg"]
+  },
   "dependencies": {
     "discord.js-selfbot-v13": "^3.7.1",
     "discord-stream-client": "^1.1.2",
