@@ -1,5 +1,5 @@
 import http from 'http';
-import { Client } from "discord.js-selfbot-v13";
+import { Client, Intents } from "discord.js-selfbot-v13";
 import { DiscordStreamClient } from "discord-stream-client";
 import ytDlp from "yt-dlp-exec";
 
@@ -12,15 +12,15 @@ http.createServer((req, res) => {
     console.log("[System] Serverul de mentinere uptime a pornit.");
 });
 
-// 2. CONFIGURARE SELFBOT CU TOATE PERMISIUNILE DE CITIRE
+// 2. INITIALIZARE CLIENT CU INTENTS DIRECTE (Bitwise FLAGS)
 const client = new Client({
     checkUpdate: false,
-    patchVoice: true, // Esential pentru ecrane video/screenshare active
+    patchVoice: true,
     intents: [
-        "GUILDS",
-        "GUILD_MESSAGES",
-        "DIRECT_MESSAGES",
-        "GUILD_VOICE_STATES"
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.DIRECT_MESSAGES,
+        Intents.FLAGS.GUILD_VOICE_STATES
     ]
 });
 
@@ -57,7 +57,6 @@ async function getRawStreamUrl(url) {
 }
 
 client.on("ready", () => {
-    // Mesaj critic in Log-uri ca sa stim sigur daca s-a autentificat contul corect
     console.log(`=========================================`);
     console.log(`STATUS: CONECTAT CU SUCCES!`);
     console.log(`Cont utilizator activat: ${client.user.tag}`);
@@ -65,7 +64,7 @@ client.on("ready", () => {
 });
 
 client.on("messageCreate", async (message) => {
-    // IMPORTANT: Robotul reactioneaza DOAR cand TU trimiti mesajul!
+    // Asculta DOAR comenzile trimise de contul tau
     if (message.author.id !== client.user.id) return;
     if (!message.content.startsWith(PREFIX)) return;
 
@@ -116,7 +115,7 @@ client.on("messageCreate", async (message) => {
 
     // COMANDA: !play
     if (command === "play") {
-        const videoUrl = args[0];
+        const videoUrl = args[0]; // Corectat: preia string-ul brut din primul argument
         if (!videoUrl) {
             return message.reply(`\`\`\`ansi\n${RED}[WARN]${RESET} Sintaxa incorecta. Adauga link: !play <link>\n\`\`\``);
         }
