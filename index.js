@@ -3,7 +3,7 @@ import { Client } from "discord.js-selfbot-v13";
 import { DiscordStreamClient } from "discord-stream-client";
 import ytDlp from "yt-dlp-exec";
 
-// 1. SERVER WEB PENTRU UPTIME (Esential pentru Web Service pe Render)
+// 1. SERVER WEB PENTRU UPTIME
 http.createServer((req, res) => {
     res.writeHead(200, { 'Content-Type': 'text/plain' });
     res.write("Selfbot is alive 24/7!");
@@ -126,7 +126,7 @@ client.on("messageCreate", async (message) => {
                 try { activeVoice.disconnect(); } catch(e){}
             }
 
-            // REPARAT: Fortam extragerea canalului direct prin API pentru a evita erorile de tip "couldn't find discord..."
+            // Preluam datele proaspete ale canalului
             const targetChannel = await client.channels.fetch(voiceChannel.id);
 
             activeVoice = await StreamClient.joinVoiceChannel(
